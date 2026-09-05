@@ -1,556 +1,514 @@
-const siteData = {
-  audienceCards: [
-    {
-      icon: "👟",
-      title: "New athletes",
-      text: "Learn what events exist, what to bring, and how to take the first step toward joining the team.",
-      link: "#new",
-      linkText: "Start here"
-    },
-    {
-      icon: "🚗",
-      title: "Parents and guardians",
-      text: "Find the basics for registration, meet days, communication, transportation, and official schedules.",
-      link: "#meetday",
-      linkText: "View guide"
-    },
-    {
-      icon: "⚡",
-      title: "Current team members",
-      text: "Use this hub for expectations, coach contacts, helpful links, and quick reminders during the season.",
-      link: "#expectations-title",
-      linkText: "Team expectations"
-    },
-    {
-      icon: "🏟️",
-      title: "Visitors and fans",
-      text: "Use the school address, official calendar, and meet links to plan ahead and support the Nighthawks.",
-      link: "#links",
-      linkText: "Official links"
+'use strict';
+
+// Pure calculations are shared by the page and the lightweight Node checks.
+const TrackTools = (() => {
+  const events = Object.freeze({
+    '100': { label: '100m', kind: 'time' }, '200': { label: '200m', kind: 'time' },
+    '400': { label: '400m', kind: 'time' }, '800': { label: '800m', kind: 'time' },
+    '1600': { label: '1600m', kind: 'time' }, '3200': { label: '3200m', kind: 'time' },
+    '100h': { label: '100m hurdles', kind: 'time' }, '110h': { label: '110m hurdles', kind: 'time' },
+    '300h': { label: '300m hurdles', kind: 'time' },
+    long: { label: 'Long jump', kind: 'distance' }, triple: { label: 'Triple jump', kind: 'distance' },
+    high: { label: 'High jump', kind: 'distance' }, vault: { label: 'Pole vault', kind: 'distance' },
+    shot: { label: 'Shot put', kind: 'distance' }, discus: { label: 'Discus', kind: 'distance' }
+  });
+
+  function parseTime(input) {
+    const text = String(input).trim();
+    let value;
+    if (/^\d{1,4}(?:\.\d{1,2})?$/.test(text)) value = Number(text);
+    else if (/^\d{1,2}:[0-5]\d(?:\.\d{1,2})?$/.test(text)) {
+      const [minutes, seconds] = text.split(':').map(Number);
+      value = minutes * 60 + seconds;
+    } else return null;
+    return Number.isFinite(value) && value > 0 && value <= 3600 ? Math.round(value * 100) / 100 : null;
+  }
+
+  function formatTime(value) {
+    const hundredths = Math.round(value * 100);
+    const minutes = Math.floor(hundredths / 6000);
+    const seconds = Math.floor(hundredths % 6000 / 100);
+    const fraction = String(hundredths % 100).padStart(2, '0');
+    return minutes > 0 ? `${minutes}:${String(seconds).padStart(2, '0')}.${fraction}` : `${seconds}.${fraction}`;
+  }
+
+  function buildSplits(distance, seconds, interval) {
+    if (![100, 200, 400, 800, 1600, 3200].includes(distance) || ![100, 200, 400].includes(interval) || interval > distance || !Number.isFinite(seconds) || seconds <= 0 || seconds > 3600) return [];
+    const splits = [];
+    for (let point = interval; point < distance; point += interval) splits.push({ distance: point, time: seconds * point / distance });
+    splits.push({ distance, time: seconds });
+    return splits;
+  }
+
+  function parseMark(event, input) {
+    if (!Object.hasOwn(events, event)) return null;
+    if (events[event].kind === 'time') return parseTime(input);
+    const text = String(input).trim();
+    if (!/^\d{1,3}(?:\.\d{1,2})?$/.test(text)) return null;
+    const value = Number(text);
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }
+
+  function validDate(date) {
+    if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+    const parsed = new Date(`${date}T12:00:00Z`);
+    return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+  }
+
+  function validMarks(value) {
+    return Array.isArray(value) && value.length <= 2000 && value.every(mark => mark &&
+      typeof mark.id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(mark.id) && Object.hasOwn(events, mark.event) &&
+      typeof mark.value === 'number' && Number.isFinite(mark.value) && mark.value > 0 &&
+      mark.value <= (events[mark.event].kind === 'time' ? 3600 : 999.99) && validDate(mark.date)) &&
+      new Set(value.map(mark => mark.id)).size === value.length;
+  }
+
+  function bests(marks) {
+    return marks.reduce((best, mark) => {
+      if (!Object.hasOwn(events, mark.event)) return best;
+      const previous = best[mark.event];
+      if (previous === undefined || (events[mark.event].kind === 'time' ? mark.value < previous : mark.value > previous)) best[mark.event] = mark.value;
+      return best;
+    }, {});
+  }
+
+  function formatMark(mark) {
+    return events[mark.event].kind === 'time' ? formatTime(mark.value) : `${mark.value.toFixed(2)} m`;
+  }
+
+  function marksCSV(marks) {
+    const rows = [['Date', 'Event', 'Mark', 'Unit', 'Personal best']];
+    const best = bests(marks);
+    [...marks].sort((a, b) => b.date.localeCompare(a.date)).forEach(mark => {
+      rows.push([mark.date, events[mark.event].label, mark.value.toFixed(2), events[mark.event].kind === 'time' ? 'seconds' : 'meters', mark.value === best[mark.event] ? 'Yes' : '']);
+    });
+    return rows.map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\r\n');
+  }
+
+  return Object.freeze({ events, parseTime, formatTime, buildSplits, parseMark, validDate, validMarks, bests, formatMark, marksCSV });
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = TrackTools;
+
+if (typeof document !== 'undefined') {
+  const $ = (selector, scope = document) => scope.querySelector(selector);
+  const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+  const storageKeys = { marks: 'northfield.track.marks.v1', packing: 'northfield.track.packing.v1', reaction: 'northfield.track.reaction.v1' };
+  const blockedKeys = new Set();
+  let toastTimer;
+  let lastDialogTrigger;
+
+  function toast(message, undo) {
+    const element = $('#toast');
+    clearTimeout(toastTimer);
+    element.replaceChildren(document.createTextNode(message));
+    if (undo) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'undo-button';
+      button.textContent = 'Undo';
+      button.addEventListener('click', () => { undo(); element.hidden = true; }, { once: true });
+      element.append(button);
     }
-  ],
+    element.hidden = false;
+    toastTimer = setTimeout(() => { element.hidden = true; }, undo ? 12000 : 5000);
+  }
 
-  stats: [
-    {
-      number: "2024",
-      title: "Boys 4A state champions",
-      text: "Northfield captured the program’s first boys team state title with a 72-point performance."
-    },
-    {
-      number: "3rd",
-      title: "2026 5A boys finish",
-      text: "The Nighthawks placed third in the 5A boys team standings at the 2026 state meet."
-    },
-    {
-      number: "20",
-      title: "2026 state athletes",
-      text: "Northfield had 20 athletes listed at the 2026 CHSAA state meet across boys and girls events."
-    },
-    {
-      number: "24",
-      title: "Athletic opportunities",
-      text: "Northfield Athletics lists 24 CHSAA-certified athletic options across the school."
+  function storageNotice(message) {
+    $('#storageStatus').hidden = false;
+    $('#storageStatus').textContent = message;
+  }
+
+  function loadSaved(key, fallback, validate) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return fallback;
+      const parsed = JSON.parse(raw);
+      if (!validate(parsed)) throw new Error('Invalid saved data');
+      return parsed;
+    } catch {
+      blockedKeys.add(key);
+      storageNotice('Saved data could not be read on this device. Your existing data has not been changed. New changes will last for this visit only; export your marks to keep a copy.');
+      return fallback;
     }
-  ],
+  }
 
-  eventGroups: [
-    {
-      type: "sprints",
-      title: "Sprints",
-      description: "For athletes who like speed, acceleration, power, and racing in short bursts. Sprinters work on starts, mechanics, strength, and race execution.",
-      tags: ["100m", "200m", "400m", "blocks"]
-    },
-    {
-      type: "hurdles",
-      title: "Hurdles",
-      description: "For athletes who combine speed with rhythm, mobility, focus, and technique. Hurdles reward confidence and repetition.",
-      tags: ["100H", "110H", "300H", "rhythm"]
-    },
-    {
-      type: "distance",
-      title: "Distance",
-      description: "For athletes who enjoy endurance, pacing, strategy, and long-term improvement. Distance runners build strength over weeks of consistent work.",
-      tags: ["800m", "1600m", "3200m", "pacing"]
-    },
-    {
-      type: "relays",
-      title: "Relays",
-      description: "For athletes who love team energy. Relays require trust, clean handoffs, communication, and competing for something bigger than one person.",
-      tags: ["4×100", "4×200", "4×400", "4×800"]
-    },
-    {
-      type: "jumps",
-      title: "Jumps",
-      description: "For athletes who are explosive, coordinated, and willing to practice technical details. Jumpers work on approach, takeoff, body position, and landing.",
-      tags: ["long jump", "triple jump", "high jump", "pole vault"]
-    },
-    {
-      type: "throws",
-      title: "Throws",
-      description: "For athletes who want to turn strength, balance, footwork, and timing into big marks. Throwers develop power and repeatable technique.",
-      tags: ["shot put", "discus", "power", "technique"]
+  function saveLocal(key, value) {
+    if (blockedKeys.has(key)) return false;
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+    catch {
+      storageNotice('Your browser could not save these changes. They will last for this visit only. Export your marks to keep a copy.');
+      return false;
     }
-  ],
+  }
 
-  joinSteps: [
-    {
-      title: "Confirm eligibility",
-      text: "Check school, DPS, and CHSAA participation requirements before the season. Ask early if you are unsure about grades, transfer status, or paperwork."
-    },
-    {
-      title: "Complete registration and physical forms",
-      text: "Athletes generally need current physical paperwork before participating. Families should use the official athletics instructions for final requirements."
-    },
-    {
-      title: "Learn the schedule",
-      text: "Track season includes practices, invitationals, league meets, and championship meets. Always confirm dates and changes through official school channels."
-    },
-    {
-      title: "Choose a starting event group",
-      text: "You do not need to know your final event immediately. Start with your interests and let coaches help you find the best fit."
-    },
-    {
-      title: "Come prepared",
-      text: "Bring running shoes, water, weather-appropriate layers, and a positive attitude. Denver spring weather can change quickly."
+  async function copyText(text, message) {
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      toast(message);
+    } catch {
+      const input = document.createElement('textarea');
+      input.value = text;
+      input.setAttribute('aria-label', 'Text to copy');
+      input.style.cssText = 'position:fixed;inset:0 auto auto 0;width:1px;height:1px;opacity:0';
+      document.body.append(input);
+      const previousFocus = document.activeElement;
+      input.select();
+      let copied = false;
+      try { copied = document.execCommand('copy'); } catch { /* Manual selection remains available below. */ }
+      input.remove();
+      previousFocus?.focus({ preventScroll: true });
+      if (copied) toast(message);
+      else toast('Copy is unavailable. Select the visible text to copy it manually.');
     }
-  ],
+  }
 
-  meetDay: [
-    {
-      icon: "🎒",
-      title: "Before the meet",
-      text: "Pack the night before and check the schedule carefully.",
-      bullets: [
-        "Uniform and warm layers",
-        "Water bottle and snacks",
-        "Running shoes, spikes, or event shoes",
-        "Homework or quiet activities for long meets"
-      ]
-    },
-    {
-      icon: "📣",
-      title: "During the meet",
-      text: "Track meets move fast in some moments and slowly in others. Athletes should stay near the team area and listen for event calls.",
-      bullets: [
-        "Warm up before your event",
-        "Know your heat, lane, flight, or relay leg",
-        "Cheer for teammates",
-        "Respect officials, competitors, and facilities"
-      ]
-    },
-    {
-      icon: "🤝",
-      title: "After competing",
-      text: "The meet is not over just because your event is finished. Recovery and team support matter.",
-      bullets: [
-        "Cool down and hydrate",
-        "Check in with coaches",
-        "Help keep the team area clean",
-        "Support remaining Nighthawk athletes"
-      ]
+  function setupNavigation() {
+    const toggle = $('#navToggle');
+    const menu = $('#navMenu');
+    const close = (returnFocus = false) => {
+      const wasOpen = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', 'false');
+      menu.classList.remove('is-open');
+      if (returnFocus && wasOpen) toggle.focus();
+    };
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.classList.toggle('is-open', open);
+    });
+    menu.addEventListener('click', event => { if (event.target.closest('a')) close(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') close(true); });
+    document.addEventListener('pointerdown', event => { if (!event.target.closest('.site-header')) close(); });
+    const desktop = window.matchMedia('(min-width: 961px)');
+    desktop.addEventListener('change', () => close());
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length) {
+          $$('#navMenu a').forEach(link => {
+            if (link.hash === `#${visible[0].target.id}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }
+      }, { rootMargin: '-15% 0px -50% 0px', threshold: [0, 0.1, 0.5] });
+      $$('main section[id]').forEach(section => observer.observe(section));
     }
-  ],
+  }
 
-  expectations: [
-    {
-      marker: "01",
-      title: "Be early and ready",
-      text: "Arrive prepared to warm up, listen, and start on time. Small habits build a stronger team."
-    },
-    {
-      marker: "02",
-      title: "Communicate",
-      text: "Tell coaches about injuries, absences, schedule conflicts, or questions before they become bigger issues."
-    },
-    {
-      marker: "03",
-      title: "Support every event group",
-      text: "Sprinters, distance runners, jumpers, throwers, hurdlers, and relay teams all contribute to the same program."
-    },
-    {
-      marker: "04",
-      title: "Compete with class",
-      text: "Represent Northfield well through effort, sportsmanship, and respect for teammates, opponents, officials, and facilities."
-    },
-    {
-      marker: "05",
-      title: "Take academics seriously",
-      text: "Student-athletes are students first. Stay aware of eligibility expectations and ask for help early."
-    }
-  ],
-
-  coaches: [
-    {
-      name: "Joey Bender",
-      role: "Co-Head Coach",
-      initials: "JB",
-      email: "joseph_bender@dpsk12.net",
-      intro: "Coach Bender is listed by Northfield as a co-head coach for the men’s and women’s track program.",
-      bullets: [
-        "Good contact for team questions, joining the program, and season expectations.",
-        "Recognized through DPS coaching honors across multiple seasons.",
-        "Has experience coaching both cross country and track athletes."
-      ]
-    },
-    {
-      name: "Wayne Vaden",
-      role: "Co-Head Coach",
-      initials: "WV",
-      email: "wayne_vaden@dpsk12.net",
-      intro: "Coach Vaden is listed by Northfield as a co-head coach and has been part of the program since its early track seasons.",
-      bullets: [
-        "Good contact for event-specific questions, training, and program history.",
-        "Has decades of Colorado high school track coaching experience.",
-        "Northfield’s team page credits him with state championship coaching experience."
-      ]
-    }
-  ],
-
-  links: [
-    {
-      title: "Official Northfield Track & Field Page",
-      text: "Coach information, official program details, and school athletics updates.",
-      url: "https://northfield.dpsk12.org/athletics/athletic-programs/track-and-field-mens-and-womens/"
-    },
-    {
-      title: "Northfield Athletics Calendar",
-      text: "Use this for official schedule information, changes, and upcoming athletic events.",
-      url: "https://www.arbiterlive.com/Teams?entityId=44001"
-    },
-    {
-      title: "Northfield Athletics Programs",
-      text: "School athletics page with participation expectations and sports offered.",
-      url: "https://northfield.dpsk12.org/athletics/athletic-programs/"
-    },
-    {
-      title: "Northfield MileSplit Profile",
-      text: "Meet entries, results, athlete profiles, and performance history.",
-      url: "https://co.milesplit.com/teams/38893-northfield-high-school"
-    },
-    {
-      title: "CHSAA Track & Field Hub",
-      text: "State meet information, classifications, results, and championship coverage.",
-      url: "https://chsaa.co/track-and-field/2026"
-    },
-    {
-      title: "Northfield High School",
-      text: "Main school site for general school information, contact details, and announcements.",
-      url: "https://northfield.dpsk12.org/"
-    }
-  ]
-};
-
-const $ = (selector, scope = document) => scope.querySelector(selector);
-const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
-
-function renderAudienceCards() {
-  const grid = $("#audienceGrid");
-  if (!grid) return;
-
-  grid.innerHTML = siteData.audienceCards
-    .map(
-      (card) => `
-        <article class="audience-card reveal">
-          <div class="icon" aria-hidden="true">${card.icon}</div>
-          <h2>${card.title}</h2>
-          <p>${card.text}</p>
-          <a href="${card.link}">${card.linkText}</a>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderStats() {
-  const grid = $("#statGrid");
-  if (!grid) return;
-
-  grid.innerHTML = siteData.stats
-    .map(
-      (stat) => `
-        <article class="stat-card reveal">
-          <p class="stat-number">${stat.number}</p>
-          <h3>${stat.title}</h3>
-          <p>${stat.text}</p>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderEventFilters() {
-  const filters = $("#eventFilters");
-  if (!filters) return;
-
-  const filterLabels = [
-    { value: "all", label: "All" },
-    ...siteData.eventGroups.map((group) => ({ value: group.type, label: group.title }))
+  const eventGroups = [
+    { id: 'sprints', number: '01', category: 'track', name: 'Sprints', tagline: 'Big energy. Short distance.', description: 'Explosive starts, full commitment, and finding another gear when it matters.', tags: ['100m', '200m', '400m'], training: 'Starts, acceleration, running mechanics, speed endurance, and putting a whole race together.', fit: 'You love going fast, competing side by side, and making every second count.' },
+    { id: 'distance', number: '02', category: 'track', name: 'Distance', tagline: 'Play the long game.', description: 'Find your rhythm, trust your pace, and save something for the final stretch.', tags: ['800m', '1600m', '3200m'], training: 'Consistent running, pacing, endurance, and choosing when to make your move.', fit: 'You like a challenge that rewards patience, persistence, and smart racing.' },
+    { id: 'hurdles', number: '03', category: 'track', name: 'Hurdles', tagline: 'Find your rhythm. Fly.', description: 'Speed meets precision. Connect the spaces between the barriers and keep moving.', tags: ['100m H', '110m H', '300m H'], training: 'Lead and trail leg technique, hurdle rhythm, mobility, and confident approaches.', fit: 'You enjoy learning technical skills and want to mix speed with coordination.' },
+    { id: 'relays', number: '04', category: 'track', name: 'Relays', tagline: 'Four athletes. One finish.', description: 'Bring your speed. Trust the handoff. Run for the people waiting at the finish.', tags: ['4×100m', '4×200m', '4×400m', '4×800m'], training: 'Baton exchanges, communication, relay legs, and staying composed under pressure.', fit: 'You get an extra boost from being part of a team and delivering for your teammates.' },
+    { id: 'jumps', number: '05', category: 'field', name: 'Jumps', tagline: 'A little more air time.', description: 'Turn approach speed, timing, and takeoff into a mark you can’t wait to beat.', tags: ['Long', 'Triple', 'High', 'Pole vault'], training: 'Consistent approaches, takeoffs, body position, and safe landings with your event coach.', fit: 'You like explosive movement, technical details, and learning by doing.' },
+    { id: 'throws', number: '06', category: 'field', name: 'Throws', tagline: 'Power with a purpose.', description: 'Build your technique. Find your balance. Send your next mark a little farther.', tags: ['Shot put', 'Discus'], training: 'Footwork, balance, release mechanics, and controlling power through the whole movement.', fit: 'You want to combine strength and coordination in a skill you can keep refining.' }
   ];
 
-  filters.innerHTML = filterLabels
-    .map(
-      (filter, index) => `
-        <button class="filter-button" type="button" data-filter="${filter.value}" aria-pressed="${index === 0}">
-          ${filter.label}
-        </button>
-      `
-    )
-    .join("");
-}
-
-function renderEvents(activeFilter = "all") {
-  const grid = $("#eventGrid");
-  if (!grid) return;
-
-  const groups =
-    activeFilter === "all"
-      ? siteData.eventGroups
-      : siteData.eventGroups.filter((group) => group.type === activeFilter);
-
-  grid.innerHTML = groups
-    .map(
-      (group) => `
-        <article class="event-card reveal is-visible" data-event-type="${group.type}">
-          <h3>${group.title}</h3>
-          <p>${group.description}</p>
-          <div class="event-tags" aria-label="Example events">
-            ${group.tags.map((tag) => `<span>${tag}</span>`).join("")}
-          </div>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function setupEventFilters() {
-  const filters = $("#eventFilters");
-  if (!filters) return;
-
-  filters.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-filter]");
-    if (!button) return;
-
-    const activeFilter = button.dataset.filter;
-
-    $$("[data-filter]", filters).forEach((filterButton) => {
-      filterButton.setAttribute("aria-pressed", String(filterButton === button));
-    });
-
-    renderEvents(activeFilter);
-  });
-}
-
-function renderJoinSteps() {
-  const list = $("#joinSteps");
-  if (!list) return;
-
-  list.innerHTML = siteData.joinSteps
-    .map(
-      (step, index) => `
-        <article class="step-card">
-          <div class="step-number">${String(index + 1).padStart(2, "0")}</div>
-          <div>
-            <h3>${step.title}</h3>
-            <p>${step.text}</p>
-          </div>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderMeetDay() {
-  const grid = $("#meetDayGrid");
-  if (!grid) return;
-
-  grid.innerHTML = siteData.meetDay
-    .map(
-      (card) => `
-        <article class="meetday-card reveal">
-          <div class="card-icon" aria-hidden="true">${card.icon}</div>
-          <h3>${card.title}</h3>
-          <p>${card.text}</p>
-          <ul>
-            ${card.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
-          </ul>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderExpectations() {
-  const list = $("#expectationList");
-  if (!list) return;
-
-  list.innerHTML = siteData.expectations
-    .map(
-      (item) => `
-        <article class="expectation-item">
-          <span>${item.marker}</span>
-          <div>
-            <h3>${item.title}</h3>
-            <p>${item.text}</p>
-          </div>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderCoaches() {
-  const grid = $("#coachGrid");
-  if (!grid) return;
-
-  grid.innerHTML = siteData.coaches
-    .map(
-      (coach) => `
-        <article class="coach-card reveal">
-          <div class="coach-card-header">
-            <div class="avatar" aria-hidden="true">${coach.initials}</div>
-            <div>
-              <h3>${coach.name}</h3>
-              <p>${coach.role}</p>
-            </div>
-          </div>
-
-          <div class="coach-card-body">
-            <p>${coach.intro}</p>
-            <ul>
-              ${coach.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
-            </ul>
-            <div class="coach-actions">
-              <a class="button button-navy" href="mailto:${coach.email}">Email ${coach.name.split(" ")[0]}</a>
-            </div>
-          </div>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function renderLinks() {
-  const grid = $("#linkGrid");
-  if (!grid) return;
-
-  grid.innerHTML = siteData.links
-    .map(
-      (link) => `
-        <article class="link-card">
-          <h3>${link.title}</h3>
-          <p>${link.text}</p>
-          <a href="${link.url}" target="_blank" rel="noopener">Open page</a>
-        </article>
-      `
-    )
-    .join("");
-}
-
-function setupNavigation() {
-  const toggle = $("[data-nav-toggle]");
-  const menu = $("[data-nav-menu]");
-  const header = $("[data-header]");
-
-  if (header) {
-    const updateHeader = () => {
-      header.classList.toggle("is-scrolled", window.scrollY > 12);
+  function setupEvents() {
+    const grid = $('#eventGrid');
+    const render = filter => {
+      const groups = eventGroups.filter(group => filter === 'all' || group.category === filter);
+      // These templates contain only the fixed event data above, never athlete-entered text.
+      grid.innerHTML = groups.map(group => `<article class="event-card" data-event="${group.id}"><div class="event-card-top"><span class="event-number" aria-hidden="true">${group.number}</span><span class="event-category">${group.category.toUpperCase()}</span></div><h3>${group.name}</h3><p>${group.tagline} ${group.description}</p><div class="event-tags">${group.tags.map(tag => `<span>${tag}</span>`).join('')}</div><button class="event-open" type="button" data-event-open="${group.id}" aria-haspopup="dialog">Explore ${group.name.toLowerCase()} <span aria-hidden="true">↗</span></button></article>`).join('');
+      $('#eventCount').textContent = `Showing ${groups.length} ${filter === 'all' ? '' : `${filter} `}event groups.`;
     };
-
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
+    render('all');
+    $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
+      $$('[data-filter]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      render(button.dataset.filter);
+    }));
+    const dialog = $('#eventDialog');
+    grid.addEventListener('click', event => {
+      const button = event.target.closest('[data-event-open]');
+      if (!button) return;
+      const group = eventGroups.find(item => item.id === button.dataset.eventOpen);
+      if (!group) return;
+      lastDialogTrigger = button;
+      $('#dialogCategory').textContent = `${group.category.toUpperCase()} / EVENT GUIDE`;
+      $('#dialogNumber').textContent = group.number;
+      $('#dialogTitle').textContent = group.name;
+      $('#dialogDescription').textContent = `${group.tagline} ${group.description}`;
+      $('#dialogTags').replaceChildren(...group.tags.map(tag => { const span = document.createElement('span'); span.textContent = tag; return span; }));
+      $('#dialogTraining').textContent = group.training;
+      $('#dialogFit').textContent = group.fit;
+      $('#dialogCoach').href = `mailto:joseph_bender@dpsk12.net?subject=${encodeURIComponent(`Northfield Track & Field — ${group.name}`)}`;
+      dialog.showModal();
+      document.body.classList.add('dialog-open');
+      $('#closeDialog').focus();
+    });
+    $('#closeDialog').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    });
+    dialog.addEventListener('close', () => { document.body.classList.remove('dialog-open'); lastDialogTrigger?.focus({ preventScroll: true }); });
   }
 
-  if (!toggle || !menu) return;
-
-  const closeMenu = () => {
-    toggle.setAttribute("aria-expanded", "false");
-    menu.classList.remove("is-open");
-    document.body.classList.remove("menu-open");
-  };
-
-  toggle.addEventListener("click", () => {
-    const isOpen = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!isOpen));
-    menu.classList.toggle("is-open", !isOpen);
-    document.body.classList.toggle("menu-open", !isOpen);
-  });
-
-  menu.addEventListener("click", (event) => {
-    if (event.target.closest("a")) closeMenu();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeMenu();
-  });
-}
-
-function setupCopyContact() {
-  const button = $("[data-copy-contact]");
-  const status = $("[data-copy-status]");
-  if (!button || !status) return;
-
-  const contactText =
-    "Northfield High School\n5500 Central Park Blvd.\nDenver, CO 80238\nMain Line: 720-423-8000\nEmail: nhscommunications@dpsk12.org";
-
-  button.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(contactText);
-      status.textContent = "Contact info copied.";
-    } catch (error) {
-      status.textContent = "Copy failed. Select and copy the contact text manually.";
-    }
-
-    window.setTimeout(() => {
-      status.textContent = "";
-    }, 3500);
-  });
-}
-
-function setupRevealAnimation() {
-  const elements = $$(".reveal");
-  if (!elements.length) return;
-
-  if (!("IntersectionObserver" in window)) {
-    elements.forEach((element) => element.classList.add("is-visible"));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
+  let cancelReaction = () => {};
+  function setupTabs() {
+    const tabs = $$('.lab-tabs [role="tab"]');
+    function activate(tab) {
+      tabs.forEach(item => {
+        const active = item === tab;
+        item.setAttribute('aria-selected', String(active));
+        item.tabIndex = active ? 0 : -1;
+        document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
       });
-    },
-    { threshold: 0.14 }
-  );
+      if (tab.id !== 'tab-reaction') cancelReaction();
+    }
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activate(tab));
+      tab.addEventListener('keydown', event => {
+        let next;
+        if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+        else if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = tabs.length - 1;
+        else return;
+        event.preventDefault();
+        activate(tabs[next]);
+        tabs[next].focus();
+      });
+    });
+  }
 
-  elements.forEach((element) => observer.observe(element));
-}
+  function setupPace() {
+    const distanceInput = $('#paceDistance');
+    const timeInput = $('#paceTime');
+    const intervalInput = $('#paceInterval');
+    let currentCopy = '';
+    function calculate() {
+      const distance = Number(distanceInput.value);
+      const seconds = TrackTools.parseTime(timeInput.value);
+      if (seconds === null) {
+        timeInput.setAttribute('aria-invalid', 'true');
+        $('#paceError').textContent = 'Enter a positive time up to 60 minutes, like 65.00 or 1:05.00. Use up to two decimal places.';
+        $('#paceResults').hidden = true;
+        return false;
+      }
+      $('#paceError').textContent = '';
+      timeInput.removeAttribute('aria-invalid');
+      $('#paceResults').hidden = false;
+      const splits = TrackTools.buildSplits(distance, seconds, Number(intervalInput.value));
+      $('#targetTime').textContent = TrackTools.formatTime(seconds);
+      $('#paceEventLabel').textContent = `${distance} M`;
+      $('#paceSummary').textContent = `${(seconds / distance * 100).toFixed(2)} seconds per 100m`;
+      $('#splitBody').innerHTML = splits.map((split, index) => `<tr><th scope="row">${split.distance}m${index === splits.length - 1 ? ' <span>FINISH</span>' : ''}</th><td>${TrackTools.formatTime(split.time)}</td></tr>`).join('');
+      currentCopy = `${distance}m goal: ${TrackTools.formatTime(seconds)}\nEven-pace cumulative splits\n${splits.map(split => `${split.distance}m: ${TrackTools.formatTime(split.time)}`).join('\n')}`;
+      return true;
+    }
+    $('#paceForm').addEventListener('submit', event => { event.preventDefault(); if (!calculate()) timeInput.focus(); });
+    distanceInput.addEventListener('change', () => {
+      const distance = Number(distanceInput.value);
+      [...intervalInput.options].forEach(option => { option.disabled = Number(option.value) > distance; });
+      if (Number(intervalInput.value) > distance) intervalInput.value = String(distance);
+      calculate();
+    });
+    intervalInput.addEventListener('change', calculate);
+    timeInput.addEventListener('input', () => { $('#paceResults').hidden = true; $('#paceError').textContent = ''; timeInput.removeAttribute('aria-invalid'); });
+    $('#copySplits').addEventListener('click', () => copyText(currentCopy, 'Race splits copied.'));
+    calculate();
+  }
 
-function setFooterYear() {
-  const year = $("#year");
-  if (year) year.textContent = new Date().getFullYear();
-}
+  function todayLocal() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
 
-function init() {
-  renderAudienceCards();
-  renderStats();
-  renderEventFilters();
-  renderEvents();
-  renderJoinSteps();
-  renderMeetDay();
-  renderExpectations();
-  renderCoaches();
-  renderLinks();
+  function setupMarks() {
+    let marks = loadSaved(storageKeys.marks, [], TrackTools.validMarks);
+    const eventInput = $('#markEvent');
+    const valueInput = $('#markValue');
+    const dateInput = $('#markDate');
+    dateInput.value = todayLocal();
+    dateInput.max = todayLocal();
+
+    function render() {
+      const list = $('#marksList');
+      list.replaceChildren();
+      $('#exportMarks').disabled = marks.length === 0;
+      if (!marks.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-marks';
+        const heading = document.createElement('strong');
+        heading.textContent = 'YOUR FIRST MARK STARTS THE STORY.';
+        const text = document.createElement('p');
+        text.textContent = 'Log a race, jump, or throw above. Your best in each event will stand out here.';
+        empty.append(heading, text);
+        list.append(empty);
+        return;
+      }
+      const best = TrackTools.bests(marks);
+      [...marks].sort((a, b) => b.date.localeCompare(a.date)).forEach(mark => {
+        const row = document.createElement('article'); row.className = 'mark-row';
+        const name = document.createElement('h4'); name.textContent = TrackTools.events[mark.event].label;
+        const result = document.createElement('p'); result.className = 'mark-result'; result.textContent = TrackTools.formatMark(mark);
+        if (mark.value === best[mark.event]) { const badge = document.createElement('span'); badge.className = 'pb-badge'; badge.textContent = 'PERSONAL BEST'; result.append(badge); }
+        const date = document.createElement('time'); date.dateTime = mark.date;
+        date.textContent = new Date(`${mark.date}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'delete-mark'; remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', `Remove ${TrackTools.events[mark.event].label} mark ${TrackTools.formatMark(mark)} from ${date.textContent}`);
+        remove.addEventListener('click', () => {
+          const index = marks.findIndex(item => item.id === mark.id);
+          marks = marks.filter(item => item.id !== mark.id);
+          saveLocal(storageKeys.marks, marks);
+          render();
+          toast('Mark removed.', () => {
+            if (marks.some(item => item.id === mark.id) || marks.length >= 2000) return;
+            marks.splice(Math.min(index, marks.length), 0, mark);
+            saveLocal(storageKeys.marks, marks);
+            render();
+          });
+          $('#markValue').focus({ preventScroll: true });
+        });
+        row.append(name, result, date, remove); list.append(row);
+      });
+    }
+    eventInput.addEventListener('change', () => {
+      const field = TrackTools.events[eventInput.value].kind === 'distance';
+      $('#markValueLabel').textContent = field ? 'Distance (meters)' : 'Time';
+      valueInput.placeholder = field ? '5.42' : '1:05.00';
+      valueInput.value = '';
+      valueInput.removeAttribute('aria-invalid');
+      $('#markHelp').textContent = field ? 'Enter meters, such as 5.42. Use the same event to compare your marks.' : 'Enter seconds or minutes:seconds. Bests are compared within the same event.';
+      $('#markError').textContent = '';
+    });
+    $('#markForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const value = TrackTools.parseMark(eventInput.value, valueInput.value);
+      valueInput.removeAttribute('aria-invalid');
+      dateInput.removeAttribute('aria-invalid');
+      if (value === null) {
+        $('#markError').textContent = TrackTools.events[eventInput.value].kind === 'time' ? 'Enter a positive time, like 65.00 or 1:05.00 (up to 60 minutes).' : 'Enter a positive distance in meters, like 5.42. Use up to two decimal places.';
+        valueInput.setAttribute('aria-invalid', 'true'); valueInput.focus(); return;
+      }
+      if (!TrackTools.validDate(dateInput.value) || dateInput.value > todayLocal()) {
+        $('#markError').textContent = 'Choose today or a past date for a completed performance.';
+        dateInput.setAttribute('aria-invalid', 'true'); dateInput.focus(); return;
+      }
+      if (marks.length >= 2000) { $('#markError').textContent = 'This log has 2,000 marks. Export a copy, then remove older entries to make room.'; return; }
+      const previous = TrackTools.bests(marks)[eventInput.value];
+      const isBest = previous === undefined || (TrackTools.events[eventInput.value].kind === 'time' ? value < previous : value > previous);
+      const id = globalThis.crypto?.randomUUID ? crypto.randomUUID() : `mark-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      marks.unshift({ id, event: eventInput.value, value, date: dateInput.value });
+      const saved = saveLocal(storageKeys.marks, marks);
+      render();
+      valueInput.value = '';
+      $('#markError').textContent = '';
+      toast(saved ? (isBest ? 'A new personal best. Let’s go, Nighthawk!' : 'Mark saved. Keep showing up.') : 'Mark added for this visit. Export a copy to keep it.');
+      valueInput.focus();
+    });
+    $('#exportMarks').addEventListener('click', () => {
+      if (!marks.length) return;
+      const url = URL.createObjectURL(new Blob(['\uFEFF' + TrackTools.marksCSV(marks)], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a'); link.href = url; link.download = `nighthawks-personal-bests-${todayLocal()}.csv`;
+      document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      toast('Your marks are ready to download.');
+    });
+    render();
+  }
+
+  function setupPacking() {
+    const boxes = $$('#packingList input');
+    const keys = boxes.map(box => box.value);
+    const saved = loadSaved(storageKeys.packing, [], value => Array.isArray(value) && value.every(key => keys.includes(key)));
+    boxes.forEach(box => { box.checked = saved.includes(box.value); });
+    function render(persist = false) {
+      const selected = boxes.filter(box => box.checked).map(box => box.value);
+      const stored = persist ? saveLocal(storageKeys.packing, selected) : !blockedKeys.has(storageKeys.packing);
+      $('#packingCount').textContent = `${selected.length}/${boxes.length}`;
+      $('#packingProgress').value = selected.length;
+      $('#packingProgress').textContent = `${selected.length} of ${boxes.length}`;
+      $('#packingStatus').textContent = selected.length === boxes.length ? (stored ? 'All packed. Go Nighthawks!' : 'All packed for this visit.') : (stored ? 'Saved on this device.' : 'Kept for this visit only.');
+    }
+    boxes.forEach(box => box.addEventListener('change', () => render(true)));
+    $('#resetPacking').addEventListener('click', () => {
+      const previous = boxes.map(box => box.checked);
+      boxes.forEach(box => { box.checked = false; }); render(true);
+      toast('Packing list reset.', () => { boxes.forEach((box, index) => { box.checked = previous[index]; }); render(true); });
+    });
+    render();
+  }
+
+  function setupReaction() {
+    const pad = $('#reactionPad');
+    const title = $('#reactionTitle');
+    const help = $('#reactionHelp');
+    let state = 'idle';
+    let timer;
+    let frame;
+    let goTime = 0;
+    let round = 0;
+    let best = loadSaved(storageKeys.reaction, null, value => value === null || (Number.isInteger(value) && value > 0 && value < 60000));
+    const renderBest = () => { $('#reactionBest').innerHTML = `${best === null ? '—' : best} <small>ms</small>`; };
+    function setState(next, label, instruction) {
+      state = next; pad.dataset.state = next; title.textContent = label; help.textContent = instruction;
+    }
+    function stopPending() { clearTimeout(timer); cancelAnimationFrame(frame); round += 1; }
+    function act() {
+      if ($('#panel-reaction').hidden) return;
+      if (state === 'waiting') {
+        stopPending();
+        setState('early', 'TOO SOON!', 'Wait for GO. Tap to try again.');
+        $('#reactionStatus').textContent = 'Too soon. Wait for GO next time.';
+      } else if (state === 'go') {
+        const elapsed = Math.max(1, Math.round(performance.now() - goTime));
+        stopPending();
+        if (elapsed >= 60000) { setState('idle', 'TRY AGAIN', 'That round timed out. Tap for a fresh start.'); return; }
+        const newBest = best === null || elapsed < best;
+        if (newBest) { best = elapsed; saveLocal(storageKeys.reaction, best); renderBest(); }
+        setState('result', `${elapsed} MS`, newBest ? 'New best! Tap to go again.' : 'Nice start. Tap to go again.');
+        $('#reactionStatus').textContent = `${elapsed} milliseconds.${newBest ? ' New personal best.' : ''}`;
+      } else {
+        stopPending();
+        const thisRound = round;
+        setState('waiting', 'HOLD…', 'Wait for GO. Don’t jump the gun.');
+        $('#reactionStatus').textContent = 'Wait for GO.';
+        timer = setTimeout(() => {
+          if (thisRound !== round || document.hidden || $('#panel-reaction').hidden) return;
+          frame = requestAnimationFrame(() => {
+            if (thisRound !== round) return;
+            goTime = performance.now();
+            setState('go', 'GO!', 'Tap now!');
+            $('#reactionStatus').textContent = 'GO!';
+          });
+        }, 1800 + Math.random() * 2600);
+      }
+    }
+    // Pointer-down avoids release-time delay. Prevent the synthetic click from recording twice.
+    pad.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || !event.isPrimary) return;
+      event.preventDefault(); pad.focus({ preventScroll: true }); act();
+    });
+    pad.addEventListener('keydown', event => {
+      if (event.key !== ' ' && event.key !== 'Enter') return;
+      event.preventDefault(); if (!event.repeat) act();
+    });
+    pad.addEventListener('click', event => { if (event.detail === 0 && !event.defaultPrevented) act(); });
+    cancelReaction = () => {
+      stopPending();
+      if (state === 'waiting' || state === 'go') {
+        setState('idle', 'READY?', 'Round paused. Tap for a fresh start.');
+        $('#reactionStatus').textContent = 'Round paused.';
+      }
+    };
+    document.addEventListener('visibilitychange', () => { if (document.hidden) cancelReaction(); });
+    window.addEventListener('blur', cancelReaction);
+    window.addEventListener('pagehide', cancelReaction);
+    renderBest();
+  }
 
   setupNavigation();
-  setupEventFilters();
-  setupCopyContact();
-  setupRevealAnimation();
-  setFooterYear();
+  setupEvents();
+  setupTabs();
+  setupPace();
+  setupMarks();
+  setupPacking();
+  setupReaction();
+  $('#year').textContent = new Date().getFullYear();
+  $('#copyContact').addEventListener('click', () => copyText('Northfield High School\n5500 Central Park Blvd.\nDenver, CO 80238\n720-423-8000\nnhscommunications@dpsk12.org', 'School contact info copied.'));
 }
-
-document.addEventListener("DOMContentLoaded", init);
