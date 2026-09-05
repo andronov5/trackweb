@@ -2,6 +2,20 @@
 
 A community website for Northfield High School's track & field and cross country Nighthawks, built with HTML, CSS, and vanilla JavaScript. The site works as static files and can be hosted directly from the repository root, including GitHub Pages. There is no build step or external runtime dependency.
 
+## Pages
+
+- `index.html` — home, supplied hero photograph, latest headline links, and team shortcuts.
+- `news.html` — sourced major news from both sports, with links to individual story cards.
+- `accomplishments.html` — combined, dated team achievements.
+- `athlete-lab.html` — pace planner, personal-best journal, and reaction challenge.
+- `meet-day.html` — preparation guide and saved packing checklist.
+- `team.html` — coaches, official resources, and school contact information.
+- `join.html` — registration and joining guidance.
+
+All pages have native links, a current-page marker, mobile navigation, and a footer sitemap. Paths are relative so direct links and refreshes work under the GitHub Pages `/trackweb/` project path. The previous homepage section bookmarks redirect to the matching page when JavaScript is enabled.
+
+Shared `script.js` initializes only controls present on the current page. Local storage keys remain unchanged, so splitting the page preserves existing saved data. Navigation and editorial content work without JavaScript; interactive tools require it.
+
 ## Features
 
 - Responsive navy-and-gold design, local fonts, and the owner-supplied hero photograph.
