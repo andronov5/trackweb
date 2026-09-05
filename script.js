@@ -6,6 +6,7 @@ const TrackTools = (() => {
     '100': { label: '100m', kind: 'time' }, '200': { label: '200m', kind: 'time' },
     '400': { label: '400m', kind: 'time' }, '800': { label: '800m', kind: 'time' },
     '1600': { label: '1600m', kind: 'time' }, '3200': { label: '3200m', kind: 'time' },
+    xc5k: { label: 'Cross country 5K', kind: 'time' },
     '100h': { label: '100m hurdles', kind: 'time' }, '110h': { label: '110m hurdles', kind: 'time' },
     '300h': { label: '300m hurdles', kind: 'time' },
     long: { label: 'Long jump', kind: 'distance' }, triple: { label: 'Triple jump', kind: 'distance' },
@@ -33,7 +34,7 @@ const TrackTools = (() => {
   }
 
   function buildSplits(distance, seconds, interval) {
-    if (![100, 200, 400, 800, 1600, 3200].includes(distance) || ![100, 200, 400].includes(interval) || interval > distance || !Number.isFinite(seconds) || seconds <= 0 || seconds > 3600) return [];
+    if (![100, 200, 400, 800, 1600, 3200, 5000].includes(distance) || ![100, 200, 400, 1000].includes(interval) || interval > distance || !Number.isFinite(seconds) || seconds <= 0 || seconds > 3600) return [];
     const splits = [];
     for (let point = interval; point < distance; point += interval) splits.push({ distance: point, time: seconds * point / distance });
     splits.push({ distance, time: seconds });
@@ -96,7 +97,6 @@ if (typeof document !== 'undefined') {
   const storageKeys = { marks: 'northfield.track.marks.v1', packing: 'northfield.track.packing.v1', reaction: 'northfield.track.reaction.v1' };
   const blockedKeys = new Set();
   let toastTimer;
-  let lastDialogTrigger;
 
   function toast(message, undo) {
     const element = $('#toast');
@@ -197,56 +197,6 @@ if (typeof document !== 'undefined') {
     }
   }
 
-  const eventGroups = [
-    { id: 'sprints', number: '01', category: 'track', name: 'Sprints', tagline: 'Big energy. Short distance.', description: 'Explosive starts, full commitment, and finding another gear when it matters.', tags: ['100m', '200m', '400m'], training: 'Starts, acceleration, running mechanics, speed endurance, and putting a whole race together.', fit: 'You love going fast, competing side by side, and making every second count.' },
-    { id: 'distance', number: '02', category: 'track', name: 'Distance', tagline: 'Play the long game.', description: 'Find your rhythm, trust your pace, and save something for the final stretch.', tags: ['800m', '1600m', '3200m'], training: 'Consistent running, pacing, endurance, and choosing when to make your move.', fit: 'You like a challenge that rewards patience, persistence, and smart racing.' },
-    { id: 'hurdles', number: '03', category: 'track', name: 'Hurdles', tagline: 'Find your rhythm. Fly.', description: 'Speed meets precision. Connect the spaces between the barriers and keep moving.', tags: ['100m H', '110m H', '300m H'], training: 'Lead and trail leg technique, hurdle rhythm, mobility, and confident approaches.', fit: 'You enjoy learning technical skills and want to mix speed with coordination.' },
-    { id: 'relays', number: '04', category: 'track', name: 'Relays', tagline: 'Four athletes. One finish.', description: 'Bring your speed. Trust the handoff. Run for the people waiting at the finish.', tags: ['4×100m', '4×200m', '4×400m', '4×800m'], training: 'Baton exchanges, communication, relay legs, and staying composed under pressure.', fit: 'You get an extra boost from being part of a team and delivering for your teammates.' },
-    { id: 'jumps', number: '05', category: 'field', name: 'Jumps', tagline: 'A little more air time.', description: 'Turn approach speed, timing, and takeoff into a mark you can’t wait to beat.', tags: ['Long', 'Triple', 'High', 'Pole vault'], training: 'Consistent approaches, takeoffs, body position, and safe landings with your event coach.', fit: 'You like explosive movement, technical details, and learning by doing.' },
-    { id: 'throws', number: '06', category: 'field', name: 'Throws', tagline: 'Power with a purpose.', description: 'Build your technique. Find your balance. Send your next mark a little farther.', tags: ['Shot put', 'Discus'], training: 'Footwork, balance, release mechanics, and controlling power through the whole movement.', fit: 'You want to combine strength and coordination in a skill you can keep refining.' }
-  ];
-
-  function setupEvents() {
-    const grid = $('#eventGrid');
-    const render = filter => {
-      const groups = eventGroups.filter(group => filter === 'all' || group.category === filter);
-      // These templates contain only the fixed event data above, never athlete-entered text.
-      grid.innerHTML = groups.map(group => `<article class="event-card" data-event="${group.id}"><div class="event-card-top"><span class="event-number" aria-hidden="true">${group.number}</span><span class="event-category">${group.category.toUpperCase()}</span></div><h3>${group.name}</h3><p>${group.tagline} ${group.description}</p><div class="event-tags">${group.tags.map(tag => `<span>${tag}</span>`).join('')}</div><button class="event-open" type="button" data-event-open="${group.id}" aria-haspopup="dialog">Explore ${group.name.toLowerCase()} <span aria-hidden="true">↗</span></button></article>`).join('');
-      $('#eventCount').textContent = `Showing ${groups.length} ${filter === 'all' ? '' : `${filter} `}event groups.`;
-    };
-    render('all');
-    $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
-      $$('[data-filter]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      render(button.dataset.filter);
-    }));
-    const dialog = $('#eventDialog');
-    grid.addEventListener('click', event => {
-      const button = event.target.closest('[data-event-open]');
-      if (!button) return;
-      const group = eventGroups.find(item => item.id === button.dataset.eventOpen);
-      if (!group) return;
-      lastDialogTrigger = button;
-      $('#dialogCategory').textContent = `${group.category.toUpperCase()} / EVENT GUIDE`;
-      $('#dialogNumber').textContent = group.number;
-      $('#dialogTitle').textContent = group.name;
-      $('#dialogDescription').textContent = `${group.tagline} ${group.description}`;
-      $('#dialogTags').replaceChildren(...group.tags.map(tag => { const span = document.createElement('span'); span.textContent = tag; return span; }));
-      $('#dialogTraining').textContent = group.training;
-      $('#dialogFit').textContent = group.fit;
-      $('#dialogCoach').href = `mailto:joseph_bender@dpsk12.net?subject=${encodeURIComponent(`Northfield Track & Field — ${group.name}`)}`;
-      dialog.showModal();
-      document.body.classList.add('dialog-open');
-      $('#closeDialog').focus();
-    });
-    $('#closeDialog').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', event => {
-      if (event.target !== dialog) return;
-      const bounds = dialog.getBoundingClientRect();
-      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
-    });
-    dialog.addEventListener('close', () => { document.body.classList.remove('dialog-open'); lastDialogTrigger?.focus({ preventScroll: true }); });
-  }
-
   let cancelReaction = () => {};
   function setupTabs() {
     const tabs = $$('.lab-tabs [role="tab"]');
@@ -295,7 +245,7 @@ if (typeof document !== 'undefined') {
       const splits = TrackTools.buildSplits(distance, seconds, Number(intervalInput.value));
       $('#targetTime').textContent = TrackTools.formatTime(seconds);
       $('#paceEventLabel').textContent = `${distance} M`;
-      $('#paceSummary').textContent = `${(seconds / distance * 100).toFixed(2)} seconds per 100m`;
+      $('#paceSummary').textContent = distance === 5000 ? `${TrackTools.formatTime(seconds / 5)} per kilometer` : `${(seconds / distance * 100).toFixed(2)} seconds per 100m`;
       $('#splitBody').innerHTML = splits.map((split, index) => `<tr><th scope="row">${split.distance}m${index === splits.length - 1 ? ' <span>FINISH</span>' : ''}</th><td>${TrackTools.formatTime(split.time)}</td></tr>`).join('');
       currentCopy = `${distance}m goal: ${TrackTools.formatTime(seconds)}\nEven-pace cumulative splits\n${splits.map(split => `${split.distance}m: ${TrackTools.formatTime(split.time)}`).join('\n')}`;
       return true;
@@ -303,6 +253,7 @@ if (typeof document !== 'undefined') {
     $('#paceForm').addEventListener('submit', event => { event.preventDefault(); if (!calculate()) timeInput.focus(); });
     distanceInput.addEventListener('change', () => {
       const distance = Number(distanceInput.value);
+      if (distance === 5000) intervalInput.value = '1000';
       [...intervalInput.options].forEach(option => { option.disabled = Number(option.value) > distance; });
       if (Number(intervalInput.value) > distance) intervalInput.value = String(distance);
       calculate();
@@ -373,7 +324,7 @@ if (typeof document !== 'undefined') {
       valueInput.placeholder = field ? '5.42' : '1:05.00';
       valueInput.value = '';
       valueInput.removeAttribute('aria-invalid');
-      $('#markHelp').textContent = field ? 'Enter meters, such as 5.42. Use the same event to compare your marks.' : 'Enter seconds or minutes:seconds. Bests are compared within the same event.';
+      $('#markHelp').textContent = field ? 'Enter meters, such as 5.42. Use the same event to compare your marks.' : 'Enter seconds or minutes:seconds. Bests are compared within the same event. Cross country courses and conditions vary.';
       $('#markError').textContent = '';
     });
     $('#markForm').addEventListener('submit', event => {
@@ -503,7 +454,6 @@ if (typeof document !== 'undefined') {
   }
 
   setupNavigation();
-  setupEvents();
   setupTabs();
   setupPace();
   setupMarks();

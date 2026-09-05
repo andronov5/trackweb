@@ -1,13 +1,14 @@
-# Northfield Track & Field
+# Northfield Track & Field + Cross Country
 
-A community website for Northfield High School's Nighthawks, built with HTML, CSS, and vanilla JavaScript. The site works as static files and can be hosted directly from the repository root, including GitHub Pages. There is no build step or external runtime dependency.
+A community website for Northfield High School's track & field and cross country Nighthawks, built with HTML, CSS, and vanilla JavaScript. The site works as static files and can be hosted directly from the repository root, including GitHub Pages. There is no build step or external runtime dependency.
 
 ## Features
 
-- Responsive navy-and-gold design, local fonts, and optimized track photography.
-- Six event guides with track/field filters and keyboard-accessible dialogs.
-- Pace planner with validated race times, cumulative splits, and copy support.
-- Personal-best journal for races, hurdles, jumps, and throws, with CSV export and undoable removal.
+- Responsive navy-and-gold design, local fonts, and the owner-supplied hero photograph.
+- Major news from both sports, with dates and linked reporting.
+- Combined, dated team accomplishments with linked results.
+- Pace planner with validated race times, cumulative splits, and copy support, including 5K cross country and kilometer splits.
+- Personal-best journal for track races, cross country 5K, hurdles, jumps, and throws, with CSV export and undoable removal.
 - Reaction challenge for touch, pointer, and keyboard, with a device-local best.
 - Persistent meet-day packing checklist, registration guidance, coach contacts, and official schedule/results links.
 - Reduced-motion support, native form controls, keyboard tab navigation, and print styling for meet-day preparation.
@@ -25,8 +26,10 @@ These checks verify calculations, time formatting, record validation, personal-b
 
 ## Content and assets
 
-Official links and contacts are retained from the original site; coaching roles/emails were checked against the Northfield team page. The championship reference links to CHSAA's Northfield history. Schedules and results open the original external sources and are not copied into an invented local calendar.
+Official links and contacts are retained from the original site; coaching roles are checked against the Northfield track and cross country pages. Selected news and accomplishments were checked September 5, 2026. Each item links to the report or meet results supporting it. Classification, gender, and year are explicit; individual national performances are distinguished from school team championships. News is curated static content, not an automatically refreshed feed.
 
-See `assets/CREDITS.md` for photo and font sources. The hero is a generic track photo, not a photograph of Northfield's facility.
+Cross country 5K marks are saved separately from track races. Courses and conditions vary, so the page does not treat equal distances on different courses as equivalent performances. Existing browser-storage keys are preserved to retain previously saved marks, packing selections, and reaction records.
+
+See `assets/CREDITS.md` for photo and font sources. The hero uses the image supplied by the owner. See `CONTENT_SOURCES.md` for the news, result, and team-page references.
 
 This is a community hub, not an official Denver Public Schools publication.
