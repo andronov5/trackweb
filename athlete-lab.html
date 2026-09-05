@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a2031">
+  <meta name="description" content="Plan track and cross country race splits, keep your personal bests, and try the reaction challenge.">
+  <title>Athlete lab | Northfield Track &amp; Cross Country</title>
+  <link rel="canonical" href="https://andronov5.github.io/trackweb/athlete-lab.html">
+  <link rel="preload" href="assets/barlow-condensed-800.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=pages-20260905">
+  <script src="script.js?v=pages-20260905" defer></script>
+</head>
+<body id="top" data-page="athlete-lab">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Northfield Track and Field and Cross Country home">
+        <span class="brand-mark" aria-hidden="true">N<span>\</span></span>
+        <span class="brand-name">NORTHFIELD<small>TRACK &amp; FIELD + CROSS COUNTRY</small></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu">Menu <span aria-hidden="true">＋</span></button>
+      <div class="nav-links" id="navMenu">
+        <a href="index.html">Home</a>
+        <a href="news.html">News</a>
+        <a href="accomplishments.html">Our legacy</a>
+        <a href="athlete-lab.html" aria-current="page">Athlete lab</a>
+        <a href="meet-day.html">Meet day</a>
+        <a href="team.html">The team</a>
+        <a href="join.html" class="button button-small">Join the team</a>
+      </div>
+    </nav>
+  </header>
+  <main id="main">
+<section class="athlete-section section" id="athlete-lab" aria-labelledby="lab-title">
+      <div class="wrap">
+        <div class="section-top">
+          <div><p class="eyebrow">THE ATHLETE LAB</p><h1 class="page-title" id="lab-title">CHASE YOUR<br><span class="text-gold">NEXT BEST.</span></h1></div>
+          <p class="section-intro">Plan race splits, log personal bests, or challenge your reaction time.</p>
+        </div>
+        <noscript><p class="no-script-note">Enable JavaScript to calculate splits, save marks, and play the reaction challenge.</p></noscript>
+        <div class="lab-tabs" role="tablist" aria-label="Athlete tools">
+          <button type="button" role="tab" id="tab-pace" aria-controls="panel-pace" aria-selected="true" tabindex="0">01 <span>Pace planner</span></button>
+          <button type="button" role="tab" id="tab-marks" aria-controls="panel-marks" aria-selected="false" tabindex="-1">02 <span>My personal bests</span></button>
+          <button type="button" role="tab" id="tab-reaction" aria-controls="panel-reaction" aria-selected="false" tabindex="-1">03 <span>Reaction challenge</span></button>
+        </div>
+        <div class="lab-panel" role="tabpanel" id="panel-pace" aria-labelledby="tab-pace" tabindex="0">
+          <div class="pace-grid">
+            <div class="lab-inputs">
+              <p class="mini-label">MAKE A PLAN</p><h3>One goal. Broken down.</h3>
+              <p>Pick a distance and a target time to see your even-pace splits.</p>
+              <form id="paceForm" novalidate>
+                <div class="form-row">
+                  <label>Race distance<select id="paceDistance" name="distance"><option value="100">100 meters</option><option value="200">200 meters</option><option value="400" selected>400 meters</option><option value="800">800 meters</option><option value="1600">1600 meters</option><option value="3200">3200 meters</option><option value="5000">5K / cross country</option></select></label>
+                  <label>Goal time<input id="paceTime" name="time" type="text" inputmode="decimal" value="1:00.00" maxlength="12" aria-describedby="paceHelp paceError" required></label>
+                </div>
+                <p class="field-help" id="paceHelp">Seconds (60.00) or minutes:seconds (1:00.00).</p>
+                <label>Show a split every<select id="paceInterval" name="interval"><option value="100" selected>100 meters</option><option value="200">200 meters</option><option value="400">400 meters</option><option value="1000" disabled>1 kilometer</option></select></label>
+                <p class="form-error" id="paceError" role="alert"></p>
+                <button class="button" type="submit">Calculate my splits <span aria-hidden="true">↗</span></button>
+              </form>
+              <p class="small-note">Even-pace estimates. Cross country terrain and conditions affect your splits; plan your race with your coach.</p>
+            </div>
+            <div class="pace-results" id="paceResults" aria-live="polite" aria-atomic="true">
+              <div class="result-top"><span class="mini-label">YOUR TARGET</span><span id="paceEventLabel" class="pill">400 M</span></div>
+              <p class="target-time" id="targetTime">1:00.00</p>
+              <p id="paceSummary" class="pace-summary">15.00 seconds per 100m</p>
+              <table class="split-table"><caption class="sr-only">Cumulative even-pace splits</caption><thead><tr><th scope="col">DISTANCE</th><th scope="col">CUMULATIVE TIME</th></tr></thead><tbody id="splitBody"><tr><th scope="row">100m</th><td>15.00</td></tr><tr><th scope="row">200m</th><td>30.00</td></tr><tr><th scope="row">300m</th><td>45.00</td></tr><tr><th scope="row">400m <span>FINISH</span></th><td>1:00.00</td></tr></tbody></table>
+              <button class="text-button" id="copySplits" type="button">Copy splits <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="lab-panel" role="tabpanel" id="panel-marks" aria-labelledby="tab-marks" tabindex="0" hidden>
+          <div class="marks-heading"><div><p class="mini-label">YOUR PROGRESS, YOUR WAY</p><h3>Keep the marks that matter.</h3><p>Saved on this device. Export a copy to keep your progress.</p></div><button type="button" class="button button-outline" id="exportMarks">Export CSV <span aria-hidden="true">↗</span></button></div>
+          <form id="markForm" novalidate>
+            <div class="mark-fields">
+              <label>Event<select id="markEvent" name="event"><option value="100">100m</option><option value="200">200m</option><option value="400" selected>400m</option><option value="800">800m</option><option value="1600">1600m</option><option value="3200">3200m</option><option value="xc5k">Cross country 5K</option><option value="100h">100m hurdles</option><option value="110h">110m hurdles</option><option value="300h">300m hurdles</option><option value="long">Long jump</option><option value="triple">Triple jump</option><option value="high">High jump</option><option value="vault">Pole vault</option><option value="shot">Shot put</option><option value="discus">Discus</option></select></label>
+              <label><span id="markValueLabel">Time</span><input type="text" id="markValue" name="value" placeholder="1:05.00" inputmode="decimal" maxlength="12" required aria-describedby="markHelp markError"></label>
+              <label>Date<input id="markDate" name="date" type="date" required aria-describedby="markError"></label>
+              <button class="button" type="submit">Save mark <span aria-hidden="true">＋</span></button>
+            </div>
+            <p id="markHelp" class="field-help">Enter seconds or minutes:seconds. Bests are compared within the same event. Cross country courses and conditions vary.</p>
+            <p id="markError" class="form-error" role="alert"></p>
+          </form>
+          <div id="marksList" class="marks-list" aria-live="polite"></div>
+        </div>
+        <div class="lab-panel" role="tabpanel" id="panel-reaction" aria-labelledby="tab-reaction" tabindex="0" hidden>
+          <div class="reaction-grid">
+            <div><p class="mini-label">ON YOUR MARKS</p><h3>How quick is your click?</h3><p>Start a round. Hold until you see <strong>GO</strong>, then tap as fast as you can.</p><p class="small-note">Keyboard: focus the pad and use Space or Enter. Just for fun—your screen and device affect the result.</p><div class="reaction-best"><span>YOUR BEST ON THIS DEVICE</span><strong id="reactionBest">— <small>ms</small></strong></div></div>
+            <button type="button" id="reactionPad" class="reaction-pad" data-state="idle" aria-describedby="reactionHelp"><span class="reaction-lights" aria-hidden="true"><i></i><i></i><i></i></span><span id="reactionTitle">READY?</span><span id="reactionHelp">Tap to start the challenge</span></button>
+          </div>
+          <p id="reactionStatus" class="sr-only" role="status" aria-live="polite"></p>
+        </div>
+        <p id="storageStatus" class="storage-status" role="status" hidden></p>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-top"><div><a class="footer-brand" href="index.html">NORTHFIELD.</a><p>Track &amp; field. Cross country.<br>One Nighthawk community.</p></div>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="index.html">Home</a>
+          <a href="news.html">News</a>
+          <a href="accomplishments.html">Our legacy</a>
+          <a href="athlete-lab.html" aria-current="page">Athlete lab</a>
+          <a href="meet-day.html">Meet day</a>
+          <a href="team.html">The team</a>
+          <a href="join.html">Join the team</a>
+        </nav>
+      </div>
+      <div class="footer-bottom"><p>DENVER, COLORADO</p><p>Community hub · Not an official DPS publication · <span id="year">2026</span></p><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

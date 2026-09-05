@@ -100,6 +100,7 @@ if (typeof document !== 'undefined') {
 
   function toast(message, undo) {
     const element = $('#toast');
+    if (!element) return;
     clearTimeout(toastTimer);
     element.replaceChildren(document.createTextNode(message));
     if (undo) {
@@ -115,8 +116,10 @@ if (typeof document !== 'undefined') {
   }
 
   function storageNotice(message) {
-    $('#storageStatus').hidden = false;
-    $('#storageStatus').textContent = message;
+    const status = $('#storageStatus');
+    if (!status) return;
+    status.hidden = false;
+    status.textContent = message;
   }
 
   function loadSaved(key, fallback, validate) {
@@ -167,6 +170,7 @@ if (typeof document !== 'undefined') {
   function setupNavigation() {
     const toggle = $('#navToggle');
     const menu = $('#navMenu');
+    if (!toggle || !menu) return;
     const close = (returnFocus = false) => {
       const wasOpen = toggle.getAttribute('aria-expanded') === 'true';
       toggle.setAttribute('aria-expanded', 'false');
@@ -181,20 +185,21 @@ if (typeof document !== 'undefined') {
     menu.addEventListener('click', event => { if (event.target.closest('a')) close(); });
     document.addEventListener('keydown', event => { if (event.key === 'Escape') close(true); });
     document.addEventListener('pointerdown', event => { if (!event.target.closest('.site-header')) close(); });
-    const desktop = window.matchMedia('(min-width: 961px)');
+    const desktop = window.matchMedia('(min-width: 1101px)');
     desktop.addEventListener('change', () => close());
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(entries => {
-        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible.length) {
-          $$('#navMenu a').forEach(link => {
-            if (link.hash === `#${visible[0].target.id}`) link.setAttribute('aria-current', 'location');
-            else link.removeAttribute('aria-current');
-          });
-        }
-      }, { rootMargin: '-15% 0px -50% 0px', threshold: [0, 0.1, 0.5] });
-      $$('main section[id]').forEach(section => observer.observe(section));
-    }
+    // Current-page state is authored in each page so it works without JavaScript.
+  }
+
+  function followLegacyBookmark() {
+    if (document.body?.dataset.page !== 'home') return;
+    const routes = {
+      '#news': 'news.html', '#accomplishments': 'accomplishments.html',
+      '#athlete-lab': 'athlete-lab.html', '#meetday': 'meet-day.html',
+      '#new': 'join.html', '#coaches': 'team.html#coaches',
+      '#links': 'team.html#links', '#contact': 'team.html#contact'
+    };
+    const route = routes[window.location.hash];
+    if (route) window.location.replace(route);
   }
 
   let cancelReaction = () => {};
@@ -453,12 +458,15 @@ if (typeof document !== 'undefined') {
     renderBest();
   }
 
+  followLegacyBookmark();
+  window.addEventListener('hashchange', followLegacyBookmark);
   setupNavigation();
-  setupTabs();
-  setupPace();
-  setupMarks();
-  setupPacking();
-  setupReaction();
-  $('#year').textContent = new Date().getFullYear();
-  $('#copyContact').addEventListener('click', () => copyText('Northfield High School\n5500 Central Park Blvd.\nDenver, CO 80238\n720-423-8000\nnhscommunications@dpsk12.org', 'School contact info copied.'));
+  if ($('.lab-tabs')) setupTabs();
+  if ($('#paceForm')) setupPace();
+  if ($('#markForm')) setupMarks();
+  if ($('#packingList')) setupPacking();
+  if ($('#reactionPad')) setupReaction();
+  const year = $('#year');
+  if (year) year.textContent = new Date().getFullYear();
+  $('#copyContact')?.addEventListener('click', () => copyText('Northfield High School\n5500 Central Park Blvd.\nDenver, CO 80238\n720-423-8000\nnhscommunications@dpsk12.org', 'School contact info copied.'));
 }
