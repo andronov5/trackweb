@@ -4,23 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a2031">
-  <meta name="description" content="The Northfield Nighthawks Track & Field community hub. Find your event, plan race splits, track your personal bests, and get ready for meet day.">
-  <title>Northfield Track & Field — Home of the Nighthawks</title>
+  <meta name="description" content="Northfield Nighthawks track & field and cross country. Major team news, shared accomplishments, race planning, personal bests, and meet-day essentials.">
+  <title>Northfield Track & Field + Cross Country — Home of the Nighthawks</title>
   <link rel="preload" href="assets/barlow-condensed-800.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=track-xc-20260905">
+  <script src="script.js?v=track-xc-20260905" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <nav class="nav wrap" aria-label="Main navigation">
-      <a class="brand" href="#home" aria-label="Northfield Track and Field home">
+      <a class="brand" href="#home" aria-label="Northfield Track and Field and Cross Country home">
         <span class="brand-mark" aria-hidden="true">N<span>\</span></span>
-        <span class="brand-name">NORTHFIELD<small>TRACK &amp; FIELD</small></span>
+        <span class="brand-name">NORTHFIELD<small>TRACK &amp; FIELD + CROSS COUNTRY</small></span>
       </a>
       <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu">Menu <span aria-hidden="true">＋</span></button>
       <div class="nav-links" id="navMenu">
-        <a href="#events">The events</a>
+        <a href="#news">Major news</a>
+        <a href="#accomplishments">Our legacy</a>
         <a href="#athlete-lab">Athlete lab</a>
         <a href="#meetday">Meet day</a>
         <a href="#coaches">The team</a>
@@ -33,18 +34,18 @@
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span class="short-rule" aria-hidden="true"></span> NORTHFIELD HIGH SCHOOL / DENVER, CO</p>
-          <h1 id="hero-title">EVERY EVENT.<br>EVERY ATHLETE.<br><span>ONE TEAM.</span></h1>
-          <p class="hero-description">Find your fast. Find your people. Your home for all things Nighthawks track &amp; field.</p>
+          <h1 id="hero-title">EVERY SEASON.<br>EVERY ATHLETE.<br><span>ONE TEAM.</span></h1>
+          <p class="hero-description">Find your fast. Find your people. From the track to the cross country course, this is your home for all things Nighthawks.</p>
           <div class="hero-actions">
-            <a class="button" href="#events">Find your event <span aria-hidden="true">↗</span></a>
+            <a class="button" href="#news">Catch up with the team <span aria-hidden="true">↗</span></a>
             <a class="hero-secondary" href="#athlete-lab">Step into the athlete lab <span aria-hidden="true">→</span></a>
           </div>
-          <div class="hero-footnote"><a class="mini-label" href="https://chsaanow.com/history/champions/school/northfield" target="_blank" rel="noopener noreferrer">2024 BOYS 4A STATE CHAMPIONS ↗</a><span class="mini-label">NORTHFIELD, TOGETHER.</span></div>
+          <div class="hero-footnote"><a class="mini-label" href="#accomplishments">TWO SPORTS. ONE NIGHTHAWK LEGACY. ↗</a><span class="mini-label">NORTHFIELD, TOGETHER.</span></div>
         </div>
         <figure class="hero-visual">
-          <img class="hero-photo" src="assets/running-track.webp" width="1800" height="975" alt="White numbered lanes on a blue running track" fetchpriority="high">
-          <div class="photo-topline"><span>ON THE STARTING LINE</span><span>TRACK &amp; FIELD</span></div>
-          <figcaption class="photo-caption"><span class="photo-title">SHOW UP.<br>TAKE FLIGHT.</span><a id="photoCredit" href="https://www.pexels.com/photo/blue-athletic-field-332835/" target="_blank" rel="noopener noreferrer">Track photography<br>Mateusz Dach / Pexels ↗</a></figcaption>
+          <img class="hero-photo" src="assets/athlete-hero.png" width="620" height="349" alt="Runner in a red racing singlet entering an indoor arena surrounded by sparks" fetchpriority="high">
+          <div class="photo-topline"><span>THE NEXT CHAPTER</span><span>TRACK + XC</span></div>
+          <figcaption class="photo-caption"><span class="photo-title">TAKE FLIGHT.</span></figcaption>
         </figure>
       </div>
     </section>
@@ -55,30 +56,55 @@
       <a href="#meetday"><span class="quick-number">03</span><span><strong>Meet-day essentials</strong><small>Pack. Prepare. Compete.</small></span><span class="quick-arrow" aria-hidden="true">↗</span></a>
     </div>
 
-    <section class="section events-section" id="events" aria-labelledby="events-title">
+    <section class="section news-section" id="news" aria-labelledby="news-title">
       <div class="wrap">
         <div class="section-top">
-          <div><p class="eyebrow">01 / FIND YOUR EVENT</p><h2 id="events-title">THERE’S A LANE<br><span class="text-muted">FOR EVERYONE.</span></h2></div>
-          <p class="section-intro">Speed. Stamina. Strength. Something you haven’t discovered yet. Explore the events and see what feels like you.</p>
+          <div><p class="eyebrow">01 / MAJOR NEWS</p><h2 id="news-title">BIG MOMENTS.<br><span class="text-muted">NIGHTHAWK PRIDE.</span></h2></div>
+          <p class="section-intro">National stages. State titles. Breakthrough races. The stories bringing track &amp; field and cross country together.</p>
         </div>
-        <div class="event-toolbar">
-          <div class="filter-controls" role="group" aria-label="Filter event groups">
-            <button type="button" class="filter-button" data-filter="all" aria-pressed="true">All events <span>06</span></button>
-            <button type="button" class="filter-button" data-filter="track" aria-pressed="false">On the track</button>
-            <button type="button" class="filter-button" data-filter="field" aria-pressed="false">In the field</button>
-          </div>
-          <p class="small-note">No experience? You belong here, too.</p>
+        <div class="news-grid">
+          <article class="news-card news-featured">
+            <div class="news-meta"><span>TRACK &amp; FIELD</span><time datetime="2026-06-21">JUN 21, 2026</time></div>
+            <p class="news-mark">4:01.88</p><p class="news-mark-label">ONE MILE. A NATIONAL TITLE.</p>
+            <h3>Hassan takes the national mile crown.</h3>
+            <p>Northfield’s Abdinasir Hassan won the boys mile at Nike Outdoor Nationals, racing for Great Strides Track Club and bringing a national title home to Colorado.</p>
+            <a href="https://www.runnerspace.com/gprofile.php?do=news&amp;mgroup_id=44531&amp;news_id=675052" target="_blank" rel="noopener noreferrer">Read the DyeStat recap <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="news-card">
+            <div class="news-meta"><span>TRACK &amp; FIELD</span><time datetime="2026-05-16">MAY 16, 2026</time></div>
+            <p class="news-mark">13.37</p><p class="news-mark-label">GIRLS 5A 100M HURDLES</p>
+            <h3>Calender brings home state gold.</h3>
+            <p>Amber Calender won the girls Class 5A 100m hurdles at the 2026 Colorado state championships, adding another title to Northfield’s story.</p>
+            <a href="https://coloradopreps.com/greatness-achieved-as-the-2026-track-and-field-season-comes-to-an-end/" target="_blank" rel="noopener noreferrer">Read the Colorado Preps recap <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="news-card">
+            <div class="news-meta"><span>CROSS COUNTRY</span><time datetime="2025-11-22">NOV 22, 2025</time></div>
+            <p class="news-mark">NXN</p><p class="news-mark-label">THE NATIONAL STARTING LINE</p>
+            <h3>From the Southwest to nationals.</h3>
+            <p>Abdinasir Hassan placed sixth at NXR Southwest in 14:37.7 to qualify for Nike Cross Nationals. He went on to finish 34th at the national meet in December.</p>
+            <a href="https://www.runnerspace.com/gprofile.php?do=news&amp;mgroup_id=44531&amp;news_id=674679" target="_blank" rel="noopener noreferrer">Read the DyeStat feature <span aria-hidden="true">↗</span></a>
+          </article>
         </div>
-        <p id="eventCount" class="sr-only" role="status">Showing all 6 event groups.</p>
-        <div class="event-grid" id="eventGrid"></div>
-        <noscript><p>Sprints: 100m, 200m, 400m. Distance: 800m, 1600m, 3200m. Explore hurdles, relays, jumps, and throws with a coach. Enable JavaScript for the event explorer and athlete tools.</p></noscript>
+        <p class="news-updated">Selected highlights · Updated September 5, 2026</p>
+      </div>
+    </section>
+
+    <section class="legacy-section section" id="accomplishments" aria-labelledby="legacy-title">
+      <div class="wrap">
+        <div class="section-top"><div><p class="eyebrow">02 / OUR ACCOMPLISHMENTS</p><h2 id="legacy-title">TWO SPORTS.<br><span class="text-muted">ONE LEGACY.</span></h2></div><p class="section-intro">From spring championship meets to fall cross country courses, every achievement belongs in the same story.</p></div>
+        <div class="legacy-grid">
+          <article class="legacy-card"><p class="legacy-year">2025</p><div><p class="mini-label">BOYS TRACK &amp; FIELD / 5A</p><h3>A relay decided by a tenth.</h3><p>Ian Larkin, Jack Sheehan, Bridger DeCamp, and Ayuub Hassan won the state 4×800 in 7:51.26, just 0.10 seconds ahead of Mountain Vista.</p><a class="text-link" href="https://coloradopreps.com/records-fall-on-day-1-of-the-2025-state-track-and-field-meet/" target="_blank" rel="noopener noreferrer">State meet recap ↗</a></div></article>
+          <article class="legacy-card"><p class="legacy-year">2025</p><div><p class="mini-label">GIRLS + BOYS CROSS COUNTRY / 5A</p><h3>Two teams. One state meet.</h3><p>Both Northfield squads reached the Class 5A state championships. The girls finished 12th and the boys 15th on November 1.</p><a class="text-link" href="https://co.milesplit.com/meets/701417-5a-colorado-state-cross-country-championships-2025/results/1239243/raw" target="_blank" rel="noopener noreferrer">Official state results ↗</a></div></article>
+          <article class="legacy-card"><p class="legacy-year">2024</p><div><p class="mini-label">BOYS TRACK &amp; FIELD / 4A</p><h3>Team state champions.</h3><p>The boys brought home Northfield’s first track &amp; field team state championship, a landmark season for the program.</p><a class="text-link" href="https://chsaanow.com/history/champions/school/northfield" target="_blank" rel="noopener noreferrer">CHSAA championship history ↗</a></div></article>
+          <article class="legacy-card"><p class="legacy-year">2023</p><div><p class="mini-label">GIRLS TRACK &amp; FIELD / 4A</p><h3>A team on the state podium.</h3><p>Northfield’s girls finished third at the Class 4A state meet with 50.50 points, earning a place among Colorado’s top teams.</p><a class="text-link" href="https://s3.amazonaws.com/chsaanow.com/documents/2023/6/5/results_state_track_2023_4a_fullfinal.pdf" target="_blank" rel="noopener noreferrer">Official state results (PDF) ↗</a></div></article>
+        </div>
       </div>
     </section>
 
     <section class="athlete-section section" id="athlete-lab" aria-labelledby="lab-title">
       <div class="wrap">
         <div class="section-top">
-          <div><p class="eyebrow">02 / THE ATHLETE LAB</p><h2 id="lab-title">CHASE YOUR<br><span class="text-gold">NEXT BEST.</span></h2></div>
+          <div><p class="eyebrow">03 / THE ATHLETE LAB</p><h2 id="lab-title">CHASE YOUR<br><span class="text-gold">NEXT BEST.</span></h2></div>
           <p class="section-intro">A little planning. A little competition. A place to turn “what if?” into your next goal.</p>
         </div>
         <div class="lab-tabs" role="tablist" aria-label="Athlete tools">
@@ -93,15 +119,15 @@
               <p>Pick a distance and a target time to see your even-pace splits.</p>
               <form id="paceForm" novalidate>
                 <div class="form-row">
-                  <label>Race distance<select id="paceDistance" name="distance"><option value="100">100 meters</option><option value="200">200 meters</option><option value="400" selected>400 meters</option><option value="800">800 meters</option><option value="1600">1600 meters</option><option value="3200">3200 meters</option></select></label>
+                  <label>Race distance<select id="paceDistance" name="distance"><option value="100">100 meters</option><option value="200">200 meters</option><option value="400" selected>400 meters</option><option value="800">800 meters</option><option value="1600">1600 meters</option><option value="3200">3200 meters</option><option value="5000">5K / cross country</option></select></label>
                   <label>Goal time<input id="paceTime" name="time" type="text" inputmode="decimal" value="1:00.00" maxlength="12" aria-describedby="paceHelp paceError" required></label>
                 </div>
                 <p class="field-help" id="paceHelp">Seconds (60.00) or minutes:seconds (1:00.00).</p>
-                <label>Show a split every<select id="paceInterval" name="interval"><option value="100" selected>100 meters</option><option value="200">200 meters</option><option value="400">400 meters</option></select></label>
+                <label>Show a split every<select id="paceInterval" name="interval"><option value="100" selected>100 meters</option><option value="200">200 meters</option><option value="400">400 meters</option><option value="1000" disabled>1 kilometer</option></select></label>
                 <p class="form-error" id="paceError" role="alert"></p>
                 <button class="button" type="submit">Calculate my splits <span aria-hidden="true">↗</span></button>
               </form>
-              <p class="small-note">Even-pace estimates, not a race strategy. Plan your actual race with your coach.</p>
+              <p class="small-note">Even-pace estimates. Cross country terrain and conditions affect your splits; plan your race with your coach.</p>
             </div>
             <div class="pace-results" id="paceResults" aria-live="polite" aria-atomic="true">
               <div class="result-top"><span class="mini-label">YOUR TARGET</span><span id="paceEventLabel" class="pill">400 M</span></div>
@@ -116,12 +142,12 @@
           <div class="marks-heading"><div><p class="mini-label">YOUR PROGRESS, YOUR WAY</p><h3>Keep the marks that matter.</h3><p>Saved on this device. Export a copy to keep your progress.</p></div><button type="button" class="button button-outline" id="exportMarks">Export CSV <span aria-hidden="true">↗</span></button></div>
           <form id="markForm" novalidate>
             <div class="mark-fields">
-              <label>Event<select id="markEvent" name="event"><option value="100">100m</option><option value="200">200m</option><option value="400" selected>400m</option><option value="800">800m</option><option value="1600">1600m</option><option value="3200">3200m</option><option value="100h">100m hurdles</option><option value="110h">110m hurdles</option><option value="300h">300m hurdles</option><option value="long">Long jump</option><option value="triple">Triple jump</option><option value="high">High jump</option><option value="vault">Pole vault</option><option value="shot">Shot put</option><option value="discus">Discus</option></select></label>
+              <label>Event<select id="markEvent" name="event"><option value="100">100m</option><option value="200">200m</option><option value="400" selected>400m</option><option value="800">800m</option><option value="1600">1600m</option><option value="3200">3200m</option><option value="xc5k">Cross country 5K</option><option value="100h">100m hurdles</option><option value="110h">110m hurdles</option><option value="300h">300m hurdles</option><option value="long">Long jump</option><option value="triple">Triple jump</option><option value="high">High jump</option><option value="vault">Pole vault</option><option value="shot">Shot put</option><option value="discus">Discus</option></select></label>
               <label><span id="markValueLabel">Time</span><input type="text" id="markValue" name="value" placeholder="1:05.00" inputmode="decimal" maxlength="12" required aria-describedby="markHelp markError"></label>
               <label>Date<input id="markDate" name="date" type="date" required aria-describedby="markError"></label>
               <button class="button" type="submit">Save mark <span aria-hidden="true">＋</span></button>
             </div>
-            <p id="markHelp" class="field-help">Enter seconds or minutes:seconds. Bests are compared within the same event.</p>
+            <p id="markHelp" class="field-help">Enter seconds or minutes:seconds. Bests are compared within the same event. Cross country courses and conditions vary.</p>
             <p id="markError" class="form-error" role="alert"></p>
           </form>
           <div id="marksList" class="marks-list" aria-live="polite"></div>
@@ -139,11 +165,11 @@
 
     <section class="section meetday-section" id="meetday" aria-labelledby="meetday-title">
       <div class="wrap meetday-grid">
-        <div class="meetday-copy"><p class="eyebrow">03 / MEET DAY, SORTED</p><h2 id="meetday-title">LESS SCRAMBLE.<br><span class="text-muted">MORE GAME FACE.</span></h2><p>Pack the night before. Know the plan. Save your energy for the starting line.</p>
+        <div class="meetday-copy"><p class="eyebrow">04 / MEET DAY, SORTED</p><h2 id="meetday-title">LESS SCRAMBLE.<br><span class="text-muted">MORE GAME FACE.</span></h2><p>Pack the night before. Know the plan. Save your energy for the starting line.</p>
           <div class="meetday-guide">
-            <details open><summary>Before you leave <span aria-hidden="true">＋</span></summary><p>Confirm the meet location, arrival time, transportation, and your events with your coach. Check the forecast and pack layers.</p><a class="text-link" href="https://www.arbiterlive.com/Teams?entityId=44001" target="_blank" rel="noopener noreferrer">Check the official schedule ↗</a></details>
-            <details><summary>At the meet <span aria-hidden="true">＋</span></summary><p>Find the team area, check your heat, lane, flight, or relay leg, and listen for event calls. Follow your coach’s warm-up plan and cheer for teammates.</p></details>
-            <details><summary>After your event <span aria-hidden="true">＋</span></summary><p>Cool down, hydrate, and check in with a coach. Support athletes still competing, clean up the team area, and confirm the plan before leaving.</p></details>
+            <details open><summary>Before you leave <span aria-hidden="true">＋</span></summary><p>Confirm the meet location, arrival time, transportation, and your race or event with your coach. Check the forecast and pack layers.</p><a class="text-link" href="https://www.arbiterlive.com/Teams?entityId=44001" target="_blank" rel="noopener noreferrer">Check the official schedule ↗</a></details>
+            <details><summary>At the meet <span aria-hidden="true">＋</span></summary><p>Find the team area. For track &amp; field, check your heat, lane, flight, or relay leg. For cross country, check the course and starting box. Follow your coach’s warm-up plan and cheer for teammates.</p></details>
+            <details><summary>After you compete <span aria-hidden="true">＋</span></summary><p>Cool down, hydrate, and check in with a coach. Support athletes still competing, clean up the team area, and confirm the plan before leaving.</p></details>
           </div>
         </div>
         <div class="packing-card">
@@ -151,12 +177,12 @@
           <progress id="packingProgress" max="8" value="0" aria-label="Packing progress">0 of 8</progress>
           <div id="packingList" class="packing-list">
             <label><input type="checkbox" value="uniform"><span>Uniform &amp; team gear</span></label>
-            <label><input type="checkbox" value="shoes"><span>Running shoes &amp; event shoes</span></label>
+            <label><input type="checkbox" value="shoes"><span>Running shoes &amp; competition shoes</span></label>
             <label><input type="checkbox" value="layers"><span>Warm layers &amp; rain jacket</span></label>
             <label><input type="checkbox" value="water"><span>Filled water bottle</span></label>
             <label><input type="checkbox" value="snacks"><span>Snacks &amp; a packed meal</span></label>
             <label><input type="checkbox" value="sun"><span>Sunscreen &amp; a hat</span></label>
-            <label><input type="checkbox" value="schedule"><span>Meet schedule &amp; event details</span></label>
+            <label><input type="checkbox" value="schedule"><span>Meet schedule &amp; course details</span></label>
             <label><input type="checkbox" value="downtime"><span>Homework or something for downtime</span></label>
           </div>
           <div class="packing-bottom"><p id="packingStatus" role="status">Saved on this device.</p><button class="text-button" type="button" id="resetPacking">Reset list</button></div>
@@ -166,22 +192,22 @@
 
     <section class="join-section section" id="new" aria-labelledby="join-title">
       <div class="wrap join-grid">
-        <div><p class="eyebrow">04 / YOUR STARTING LINE</p><h2 id="join-title">NEW HERE?<br><span class="text-gold">YOU’RE IN<br>GOOD COMPANY.</span></h2><p>First season or fifth, there’s room to grow. Bring the effort. We’ll bring the team.</p><a class="button" href="mailto:joseph_bender@dpsk12.net?subject=Interested%20in%20Northfield%20Track%20%26%20Field">Ask about joining <span aria-hidden="true">↗</span></a></div>
+        <div><p class="eyebrow">05 / YOUR STARTING LINE</p><h2 id="join-title">NEW HERE?<br><span class="text-gold">YOU’RE IN<br>GOOD COMPANY.</span></h2><p>First season or fifth, there’s room to grow. Bring the effort. We’ll bring the team.</p><a class="button" href="mailto:joseph_bender@dpsk12.net?subject=Interested%20in%20Northfield%20Track%20and%20Cross%20Country">Ask about joining <span aria-hidden="true">↗</span></a></div>
         <ol class="join-steps">
           <li><span>01</span><div><h3>Get cleared to compete.</h3><p>Check eligibility, athletic registration, and current physical requirements through <a href="https://northfield.dpsk12.org/athletics/athletic-programs/" target="_blank" rel="noopener noreferrer">Northfield Athletics</a>.</p></div></li>
-          <li><span>02</span><div><h3>Meet your coaches.</h3><p>Ask about the next practice, what to bring, and which event group to try. You don’t have to have it all figured out.</p></div></li>
+          <li><span>02</span><div><h3>Meet your coaches.</h3><p>Ask about fall cross country, spring track &amp; field, the next practice, and what to bring. You don’t have to have it all figured out.</p></div></li>
           <li><span>03</span><div><h3>Show up ready.</h3><p>Bring running shoes, water, and layers. Confirm the schedule, arrive on time, and be ready to learn.</p></div></li>
-          <li><span>04</span><div><h3>Be a Nighthawk.</h3><p>Keep up with schoolwork, communicate about absences or injuries, respect officials, and back your teammates in every event.</p></div></li>
+          <li><span>04</span><div><h3>Be a Nighthawk.</h3><p>Keep up with schoolwork, communicate about absences or injuries, respect officials, and back your teammates in every season.</p></div></li>
         </ol>
       </div>
     </section>
 
     <section class="section coaches-section" id="coaches" aria-labelledby="coaches-title">
       <div class="wrap">
-        <div class="section-top"><div><p class="eyebrow">05 / PEOPLE IN YOUR CORNER</p><h2 id="coaches-title">MEET YOUR COACHES.</h2></div><a class="text-link" href="https://northfield.dpsk12.org/athletics/athletic-programs/track-and-field-mens-and-womens/" target="_blank" rel="noopener noreferrer">Official team page ↗</a></div>
+        <div class="section-top"><div><p class="eyebrow">06 / PEOPLE IN YOUR CORNER</p><h2 id="coaches-title">MEET YOUR COACHES.</h2></div><a class="text-link" href="https://northfield.dpsk12.org/athletics/athletic-programs/track-and-field-mens-and-womens/" target="_blank" rel="noopener noreferrer">Track &amp; field team page ↗</a></div>
         <div class="coach-grid">
-          <article class="coach-card"><div class="coach-initials" aria-hidden="true">JB</div><div class="coach-info"><p class="mini-label">CO-HEAD COACH</p><h3>Joey Bender</h3><p>Questions about joining, practices, or season expectations? Start here.</p><a href="mailto:joseph_bender@dpsk12.net">Email Coach Bender <span aria-hidden="true">↗</span></a></div></article>
-          <article class="coach-card"><div class="coach-initials" aria-hidden="true">WV</div><div class="coach-info"><p class="mini-label">CO-HEAD COACH</p><h3>Wayne Vaden</h3><p>Connect about event groups, preparation, and finding your place on the team.</p><a href="mailto:wayne_vaden@dpsk12.net">Email Coach Vaden <span aria-hidden="true">↗</span></a></div></article>
+          <article class="coach-card"><div class="coach-initials" aria-hidden="true">JB</div><div class="coach-info"><p class="mini-label">CROSS COUNTRY HEAD COACH<br>TRACK &amp; FIELD CO-HEAD COACH</p><h3>Joey Bender</h3><p>Connect about cross country, track &amp; field, practices, and joining either team.</p><a href="mailto:joseph_bender@dpsk12.net">Email Coach Bender <span aria-hidden="true">↗</span></a></div></article>
+          <article class="coach-card"><div class="coach-initials" aria-hidden="true">WV</div><div class="coach-info"><p class="mini-label">TRACK &amp; FIELD CO-HEAD COACH</p><h3>Wayne Vaden</h3><p>Connect about track &amp; field, meet preparation, and finding your place on the team.</p><a href="mailto:wayne_vaden@dpsk12.net">Email Coach Vaden <span aria-hidden="true">↗</span></a></div></article>
         </div>
       </div>
     </section>
@@ -192,14 +218,16 @@
         <a href="https://co.milesplit.com/teams/38893-northfield-high-school" target="_blank" rel="noopener noreferrer"><span>02</span> MileSplit team results <span aria-hidden="true">↗</span></a>
         <a href="https://northfield.dpsk12.org/athletics/athletic-programs/" target="_blank" rel="noopener noreferrer"><span>03</span> Northfield Athletics <span aria-hidden="true">↗</span></a>
         <a href="https://chsaanow.com/sports/track-and-field" target="_blank" rel="noopener noreferrer"><span>04</span> CHSAA track &amp; field <span aria-hidden="true">↗</span></a>
+        <a href="https://chsaanow.com/sports/cross-country" target="_blank" rel="noopener noreferrer"><span>05</span> CHSAA cross country <span aria-hidden="true">↗</span></a>
+        <a href="https://northfield.dpsk12.org/athletics/athletic-programs/cross-country-boys-and-girls/" target="_blank" rel="noopener noreferrer"><span>06</span> Northfield cross country <span aria-hidden="true">↗</span></a>
       </div></div>
     </section>
     <section class="contact-section" id="contact" aria-label="School contact">
       <div class="wrap contact-row"><div><a class="school-name" href="https://northfield.dpsk12.org/" target="_blank" rel="noopener noreferrer">Northfield High School ↗</a><address>5500 Central Park Blvd. · Denver, CO 80238</address></div><div class="school-contact"><a href="tel:+17204238000">720-423-8000</a><a href="mailto:nhscommunications@dpsk12.org">Email the school</a><button class="text-button" type="button" id="copyContact">Copy contact info</button></div></div>
     </section>
   </main>
-  <footer class="site-footer"><div class="wrap"><div class="footer-wordmark" aria-hidden="true">NIGHTHAWKS.</div><div class="footer-bottom"><p>NORTHFIELD TRACK &amp; FIELD</p><p>Community hub · Not an official DPS publication · <span id="year">2026</span></p><a href="#home">Back to top ↑</a></div></div></footer>
-  <dialog class="event-dialog" id="eventDialog" aria-labelledby="dialogTitle"><div class="dialog-top"><span class="mini-label" id="dialogCategory">EVENT GUIDE</span><button class="dialog-close" type="button" id="closeDialog" aria-label="Close event guide">×</button></div><p class="dialog-number" id="dialogNumber" aria-hidden="true">01</p><h2 id="dialogTitle">Sprints</h2><p id="dialogDescription"></p><div class="event-tags" id="dialogTags"></div><div class="dialog-columns"><div><h3>What you’ll work on</h3><p id="dialogTraining"></p></div><div><h3>Give it a try if…</h3><p id="dialogFit"></p></div></div><p class="dialog-note">Your event group is a starting point. Talk to your coach about trying something new.</p><a class="button" id="dialogCoach" href="mailto:joseph_bender@dpsk12.net">Ask a coach about this event ↗</a></dialog>
+  <footer class="site-footer"><div class="wrap"><div class="footer-wordmark" aria-hidden="true">NIGHTHAWKS.</div><div class="footer-bottom"><p>NORTHFIELD TRACK &amp; FIELD + CROSS COUNTRY</p><p>Community hub · Not an official DPS publication · <span id="year">2026</span></p><a href="#home">Back to top ↑</a></div></div></footer>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

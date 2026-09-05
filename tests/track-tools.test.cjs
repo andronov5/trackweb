@@ -71,3 +71,19 @@ test('CSV exports numeric seconds and meters with correct best badges and newest
   assert.ok(lines.includes('"2026-05-01","400m","65.00","seconds",""'));
   assert.equal(csv.includes('undefined'), false);
 });
+
+
+test('cross country has exact kilometer splits and independently saved 5K bests', () => {
+  const splits = tools.buildSplits(5000, 1200, 1000);
+  assert.deepEqual(splits, [
+    {distance:1000,time:240},{distance:2000,time:480},{distance:3000,time:720},
+    {distance:4000,time:960},{distance:5000,time:1200}
+  ]);
+  assert.equal(tools.buildSplits(5000, 1200, 400).at(-1).distance, 5000);
+  assert.equal(tools.parseMark('xc5k', '20:00'), 1200);
+  const saved = [...marks, {id:'xc-a',event:'xc5k',value:1200,date:'2026-08-22'}, {id:'xc-b',event:'xc5k',value:1175,date:'2026-08-29'}];
+  assert.equal(tools.validMarks(saved), true);
+  assert.equal(tools.bests(saved).xc5k, 1175);
+  assert.equal(tools.bests(saved)['400'], 63.5);
+  assert.ok(tools.marksCSV(saved).includes('"Cross country 5K","1175.00","seconds","Yes"'));
+});

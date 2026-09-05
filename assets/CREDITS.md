@@ -1,13 +1,11 @@
 # Asset sources
 
-## Track photography
+## Hero photograph
 
-- File: `running-track.webp` (optimized from the original photograph)
-- Photographer: Mateusz Dach
-- Source: [Blue Athletic Field, Pexels](https://www.pexels.com/photo/blue-athletic-field-332835/)
-- Original: https://images.pexels.com/photos/332835/pexels-photo-332835.jpeg?cs=srgb&dl=pexels-mateusz-dach-99805-332835.jpg&fm=jpg
-- License: [Pexels License](https://www.pexels.com/license/)
-- This is a generic athletics track and is not identified as Northfield's facility.
+- File: `athlete-hero.png`
+- Supplied by the site owner on September 5, 2026 for use in the homepage hero.
+- Copied unchanged from the supplied attachment; displayed with responsive CSS positioning.
+- The attachment did not include a photographer credit or source URL. No photographer identity or license is asserted here.
 
 ## Fonts
 
